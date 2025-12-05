@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureGen - Passwort Tool</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #1a1a2e;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .card {
+            background-color: #16213e;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            text-align: center;
+            width: 350px;
+        }
+        h1 { margin-bottom: 1.5rem; color: #0f3460; text-shadow: 0 0 5px #e94560; color: #e94560; }
+        input[type="range"] { width: 100%; margin: 1rem 0; }
+        button {
+            background-color: #e94560;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.3s;
+        }
+        button:hover { background-color: #c0354e; }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #0f3460;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 1.2rem;
+            word-break: break-all;
+            min-height: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h1>SecureGen</h1>
+    <p>Sicheres Passwort generieren</p>
+    
+    <label for="length">Länge: <span id="len-val">12</span> Zeichen</label>
+    <input type="range" id="length" min="8" max="64" value="12" oninput="document.getElementById('len-val').innerText = this.value">
+    
+    <button onclick="generatePassword()">Passwort generieren</button>
+    
+    <div id="result">...</div>
+</div>
+
+<script>
+    async function generatePassword() {
+        const length = document.getElementById('length').value;
+        const resultDiv = document.getElementById('result');
+        resultDiv.innerText = "Lade...";
+
+        try {
+            // Wir rufen /api/generate auf. Amplify leitet das an Lambda weiter.
+            const response = await fetch('/api/generate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ length: parseInt(length) })
+            });
+
+            if (!response.ok) throw new Error('Fehler beim Server');
+            
+            const data = await response.json();
+            resultDiv.innerText = data.password;
+        } catch (error) {
+            console.error(error);
+            resultDiv.innerText = "Fehler!";
+        }
+    }
+</script>
+
+</body>
+</html>
