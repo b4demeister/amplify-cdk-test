@@ -21,7 +21,7 @@ const customStack = backend.createStack('PythonBackendStack');
 
 
 const myLayer = new lambda.LayerVersion(customStack, 'MyTestLayer', {
-  code: lambda.Code.fromAsset('amplify/functions/layers/my-test-layer'),
+  code: lambda.Code.fromAsset('amplify/functions/layers/test-layer'),
   compatibleRuntimes: [lambda.Runtime.PYTHON_3_12],
   description: 'Ein Test-Layer mit testlib.py',
 });
