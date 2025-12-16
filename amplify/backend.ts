@@ -19,14 +19,21 @@ const backend = defineBackend({
 // 1. Wir erstellen einen neuen Stack für unsere Python-Sachen
 const customStack = backend.createStack('PythonBackendStack');
 
+
+const myLayer = new lambda.LayerVersion(customStack, 'MyTestLayer', {
+  code: lambda.Code.fromAsset('amplify/functions/layers/my-test-layer'),
+  compatibleRuntimes: [lambda.Runtime.PYTHON_3_12],
+  description: 'Ein Test-Layer mit testlib.py',
+});
+
 // 2. Die Python Lambda definieren
 const pythonLambda = new lambda.Function(customStack, 'PythonPasswordFn', {
   runtime: lambda.Runtime.PYTHON_3_12,
   handler: 'lambda_function.lambda_handler',
-  // Der Pfad muss relativ zur amplify/backend.ts Datei sein
   code: lambda.Code.fromAsset('amplify/functions/python-lambda'),
   memorySize: 128,
-  //timeout: cdk.Duration.seconds(3) // Optional: CDK Duration importieren oder weglassen
+  // HIER KOMMT DER LAYER DAZU:
+  layers: [myLayer] 
 });
 
 // 3. Das HTTP API Gateway definieren
@@ -47,6 +54,12 @@ const integration = new integrations.HttpLambdaIntegration(
 httpApi.addRoutes({
   path: '/generate',
   methods: [apigw.HttpMethod.POST],
+  integration: integration,
+});
+
+httpApi.addRoutes({
+  path: '/xx',
+  methods: [apigw.HttpMethod.GET, apigw.HttpMethod.POST], // Auch GET erlauben
   integration: integration,
 });
 
