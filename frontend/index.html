@@ -70,9 +70,13 @@
         resultDiv.innerText = "Lade...";
 
         try {
-            // Wir rufen /api/generate auf. Amplify leitet das an Lambda weiter.: https://d8h01due30.execute-api.eu-central-1.amazonaws.com/
+            // Deine API URL
             const apiUrl = "https://d8h01due30.execute-api.eu-central-1.amazonaws.com";
-            const response = await fetch(`${apiUrl}/generate`, {
+            
+            // HIER KANNST DU ROUTEN TESTEN:
+            // Aktuell: /generate
+            // Teste mal: /xx (einfach unten austauschen)
+            const response = await fetch(`${apiUrl}/generate`, { 
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ length: parseInt(length) })
@@ -81,7 +85,17 @@
             if (!response.ok) throw new Error('Fehler beim Server');
             
             const data = await response.json();
-            resultDiv.innerText = data.password;
+            
+            // --- DIE WICHTIGE ÄNDERUNG ---
+            // Früher: data.password
+            // Jetzt (für den Layer-Test): data.message
+            resultDiv.innerText = data.message || data.password; 
+            
+            // Optional: Zeige auch an, welche Route benutzt wurde (für Debugging)
+            if(data.path_called) {
+                 resultDiv.innerText += ` (Route: ${data.path_called})`;
+            }
+
         } catch (error) {
             console.error(error);
             resultDiv.innerText = "Fehler!";

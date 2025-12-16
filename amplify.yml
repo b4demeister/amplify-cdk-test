@@ -1,0 +1,19 @@
+version: 1
+backend:
+  phases:
+    build:
+      commands:
+        - npm ci
+        - npx ampx pipeline-deploy --branch $AWS_BRANCH --app-id $AWS_APP_ID
+frontend:
+  phases:
+    build:
+      commands:
+        - echo "Kein Build nötig"
+  artifacts:
+    baseDirectory: frontend  # <--- Das ist der Grund, warum wir die Datei brauchen!
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - node_modules/**/*
